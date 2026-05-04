@@ -78,7 +78,7 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
         </form>
 
         <p className="text-xs text-gray-500 text-center mt-8">
-          Demo credentials: admin@writeorwrong.com / admin123
+          Authorized access only
         </p>
       </div>
     </div>

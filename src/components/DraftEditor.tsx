@@ -20,7 +20,7 @@ export default function DraftEditor({ draft, categories, onClose, onSave }: Draf
   const [isFeatured, setIsFeatured] = useState(draft?.is_featured || false);
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<string>('');
-  const [saveTimer, setSaveTimer] = useState<NodeJS.Timeout | null>(null);
+  const [saveTimer, setSaveTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (draft) {
@@ -151,7 +151,6 @@ export default function DraftEditor({ draft, categories, onClose, onSave }: Draf
         }
       }
 
-      alert('Article published successfully!');
       onSave();
       onClose();
     } catch (error) {
@@ -176,7 +175,6 @@ export default function DraftEditor({ draft, categories, onClose, onSave }: Draf
 
       if (error) throw error;
 
-      alert('Draft deleted');
       onSave();
       onClose();
     } catch (error) {
@@ -188,70 +186,70 @@ export default function DraftEditor({ draft, categories, onClose, onSave }: Draf
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white rounded-lg max-w-4xl w-full my-8">
-        <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-2xl font-bold">{draft ? 'Edit Draft' : 'New Draft'}</h2>
+    <div className="fixed inset-0 bg-black/50 flex items-start justify-center z-50 overflow-y-auto">
+      <div className="bg-white rounded-lg max-w-4xl w-full my-8 shadow-xl">
+        <div className="flex justify-between items-center p-6 border-b border-gray-200">
+          <h2 className="text-xl font-bold">{draft ? 'Edit Draft' : 'New Draft'}</h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
+            className="text-gray-400 hover:text-gray-600 transition-colors"
           >
-            <X size={24} />
+            <X size={20} />
           </button>
         </div>
 
-        <div className="p-6 space-y-6 max-h-96 overflow-y-auto">
+        <div className="p-6 space-y-5">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Title</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Title</label>
             <input
               type="text"
               value={title}
               onChange={(e) => handleTitleChange(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 focus:outline-none text-sm"
               placeholder="Article title"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Slug</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Slug</label>
             <input
               type="text"
               value={slug}
               onChange={(e) => setSlug(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 focus:outline-none text-sm"
               placeholder="url-friendly-slug"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Excerpt</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Excerpt</label>
             <input
               type="text"
               value={excerpt}
               onChange={(e) => setExcerpt(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 focus:outline-none text-sm"
               placeholder="Short description"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Author</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Author</label>
             <input
               type="text"
               value={author}
               onChange={(e) => setAuthor(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 focus:outline-none text-sm"
               placeholder="Author name"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Category</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Category</label>
               <select
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 focus:outline-none text-sm"
               >
                 <option value="">No category</option>
                 {categories.map(cat => (
@@ -260,21 +258,21 @@ export default function DraftEditor({ draft, categories, onClose, onSave }: Draf
               </select>
             </div>
 
-            <div className="flex items-end">
+            <div className="flex items-end pb-1">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={isFeatured}
                   onChange={(e) => setIsFeatured(e.target.checked)}
-                  className="w-4 h-4 rounded"
+                  className="w-4 h-4 rounded border-gray-300"
                 />
-                <span className="text-sm font-semibold text-gray-700">Featured</span>
+                <span className="text-sm font-medium text-gray-700">Featured</span>
               </label>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Content</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Content</label>
             <RichTextEditor
               value={content}
               onChange={setContent}
@@ -283,9 +281,14 @@ export default function DraftEditor({ draft, categories, onClose, onSave }: Draf
           </div>
         </div>
 
-        <div className="flex justify-between items-center p-6 border-t bg-gray-50">
+        <div className="flex justify-between items-center p-6 border-t border-gray-200 bg-gray-50 rounded-b-lg">
           <div className="flex items-center gap-2">
-            {lastSaved && (
+            {isSaving && (
+              <span className="text-xs text-gray-400 flex items-center gap-1">
+                <Save size={14} /> Saving...
+              </span>
+            )}
+            {lastSaved && !isSaving && (
               <span className="text-xs text-green-600 flex items-center gap-1">
                 <CheckCircle size={14} /> Saved at {lastSaved}
               </span>
@@ -297,15 +300,15 @@ export default function DraftEditor({ draft, categories, onClose, onSave }: Draf
               <button
                 onClick={handleDelete}
                 disabled={isSaving}
-                className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
+                className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50 text-sm"
               >
-                <Trash2 size={18} /> Delete
+                <Trash2 size={16} /> Delete
               </button>
             )}
 
             <button
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors text-sm"
             >
               Close
             </button>
@@ -313,9 +316,9 @@ export default function DraftEditor({ draft, categories, onClose, onSave }: Draf
             <button
               onClick={handlePublish}
               disabled={isSaving || !title.trim() || !content.trim()}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+              className="px-5 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2 disabled:opacity-50 text-sm font-medium"
             >
-              <CheckCircle size={18} /> Publish
+              <CheckCircle size={16} /> Publish
             </button>
           </div>
         </div>

@@ -15,6 +15,8 @@ function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const isAdminRoute = window.location.pathname.startsWith('/admin');
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -50,16 +52,10 @@ function App() {
     );
   }
 
-  if (session) {
-    return (
-      <AdminDashboard
-        onLogout={() => setSession(null)}
-      />
-    );
-  }
-
-  const adminPath = window.location.pathname.includes('/admin');
-  if (adminPath) {
+  if (isAdminRoute) {
+    if (session) {
+      return <AdminDashboard onLogout={() => setSession(null)} />;
+    }
     return <AdminLogin onLoginSuccess={() => {}} />;
   }
 
@@ -82,7 +78,7 @@ function App() {
       <footer className="border-t border-gray-300 mt-20">
         <div className="max-w-4xl mx-auto px-6 py-12">
           <p className="text-sm text-gray-500 text-center">
-            Write or Wrong © {new Date().getFullYear()}
+            Write or Wrong &copy; {new Date().getFullYear()}
           </p>
         </div>
       </footer>

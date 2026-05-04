@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase, type Post, type Category, type Draft } from '../lib/supabase';
-import { LogOut, Plus, Trash2, CreditCard as Edit2, FileText, Folder, Globe, Settings } from 'lucide-react';
+import { LogOut, Plus, Trash2, CreditCard as Edit2, FileText, Folder, Globe, ExternalLink } from 'lucide-react';
 import DraftEditor from './DraftEditor';
 import CategoryManager from './CategoryManager';
 
@@ -63,7 +63,10 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
       if (editingPost) {
         const { error } = await supabase
           .from('posts')
-          .update(formData)
+          .update({
+            ...formData,
+            updated_at: new Date().toISOString(),
+          })
           .eq('id', editingPost.id);
 
         if (error) throw error;
@@ -178,68 +181,84 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   }
 
   return (
-    <div className="min-h-screen bg-white flex">
-      <aside className="w-64 border-r border-gray-300 bg-gray-50">
-        <div className="p-6 border-b border-gray-300">
-          <h2 className="text-lg font-bold">Admin</h2>
+    <div className="min-h-screen bg-gray-50 flex">
+      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-lg font-bold">Write or Wrong</h2>
+          <p className="text-xs text-gray-500 mt-1">Admin Panel</p>
         </div>
 
-        <nav className="p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-1">
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${
+            className={`w-full text-left px-4 py-2.5 rounded-lg transition-colors flex items-center gap-3 text-sm ${
               activeTab === 'dashboard'
-                ? 'bg-blue-100 text-blue-600 font-semibold'
-                : 'text-gray-700 hover:bg-gray-200'
+                ? 'bg-gray-900 text-white font-medium'
+                : 'text-gray-700 hover:bg-gray-100'
             }`}
           >
-            <Globe size={18} />
+            <Globe size={16} />
             Dashboard
           </button>
 
           <button
             onClick={() => setActiveTab('wip')}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${
+            className={`w-full text-left px-4 py-2.5 rounded-lg transition-colors flex items-center gap-3 text-sm ${
               activeTab === 'wip'
-                ? 'bg-blue-100 text-blue-600 font-semibold'
-                : 'text-gray-700 hover:bg-gray-200'
+                ? 'bg-gray-900 text-white font-medium'
+                : 'text-gray-700 hover:bg-gray-100'
             }`}
           >
-            <FileText size={18} />
+            <FileText size={16} />
             WIP Drafts
-            {drafts.length > 0 && <span className="ml-auto text-sm bg-blue-600 text-white px-2 py-1 rounded">{drafts.length}</span>}
+            {drafts.length > 0 && (
+              <span className={`ml-auto text-xs px-2 py-0.5 rounded-full ${
+                activeTab === 'wip' ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'
+              }`}>{drafts.length}</span>
+            )}
           </button>
 
           <button
             onClick={() => setActiveTab('published')}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${
+            className={`w-full text-left px-4 py-2.5 rounded-lg transition-colors flex items-center gap-3 text-sm ${
               activeTab === 'published'
-                ? 'bg-blue-100 text-blue-600 font-semibold'
-                : 'text-gray-700 hover:bg-gray-200'
+                ? 'bg-gray-900 text-white font-medium'
+                : 'text-gray-700 hover:bg-gray-100'
             }`}
           >
-            <Globe size={18} />
+            <Globe size={16} />
             Published
-            {posts.length > 0 && <span className="ml-auto text-sm bg-blue-600 text-white px-2 py-1 rounded">{posts.length}</span>}
+            {posts.length > 0 && (
+              <span className={`ml-auto text-xs px-2 py-0.5 rounded-full ${
+                activeTab === 'published' ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'
+              }`}>{posts.length}</span>
+            )}
           </button>
 
           <button
             onClick={() => setActiveTab('categories')}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${
+            className={`w-full text-left px-4 py-2.5 rounded-lg transition-colors flex items-center gap-3 text-sm ${
               activeTab === 'categories'
-                ? 'bg-blue-100 text-blue-600 font-semibold'
-                : 'text-gray-700 hover:bg-gray-200'
+                ? 'bg-gray-900 text-white font-medium'
+                : 'text-gray-700 hover:bg-gray-100'
             }`}
           >
-            <Folder size={18} />
+            <Folder size={16} />
             Categories
           </button>
         </nav>
 
-        <div className="absolute bottom-0 left-0 w-64 border-t border-gray-300 p-4">
+        <div className="p-4 border-t border-gray-200 space-y-2">
+          <a
+            href="/"
+            className="w-full flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors text-sm"
+          >
+            <ExternalLink size={16} />
+            View Site
+          </a>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            className="w-full flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-sm"
           >
             <LogOut size={16} />
             Logout
@@ -248,7 +267,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
       </aside>
 
       <main className="flex-1 overflow-auto">
-        <div className="max-w-6xl mx-auto px-8 py-12">
+        <div className="max-w-5xl mx-auto px-8 py-12">
           {activeTab === 'dashboard' && (
             <div className="space-y-8">
               <div>
@@ -257,43 +276,47 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
               </div>
 
               <div className="grid grid-cols-3 gap-6">
-                <div className="bg-blue-50 border border-blue-200 p-6 rounded-lg">
+                <div className="bg-white border border-gray-200 p-6 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-sm font-semibold text-gray-600">Published</p>
-                    <Globe size={20} className="text-blue-600" />
+                    <Globe size={20} className="text-gray-400" />
                   </div>
                   <p className="text-3xl font-bold">{posts.length}</p>
                 </div>
 
-                <div className="bg-amber-50 border border-amber-200 p-6 rounded-lg">
+                <div className="bg-white border border-gray-200 p-6 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-sm font-semibold text-gray-600">WIP Drafts</p>
-                    <FileText size={20} className="text-amber-600" />
+                    <FileText size={20} className="text-gray-400" />
                   </div>
                   <p className="text-3xl font-bold">{drafts.length}</p>
                 </div>
 
-                <div className="bg-green-50 border border-green-200 p-6 rounded-lg">
+                <div className="bg-white border border-gray-200 p-6 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-sm font-semibold text-gray-600">Categories</p>
-                    <Folder size={20} className="text-green-600" />
+                    <Folder size={20} className="text-gray-400" />
                   </div>
                   <p className="text-3xl font-bold">{categories.length}</p>
                 </div>
               </div>
 
-              <div className="border-t border-gray-300 pt-8">
+              <div className="border-t border-gray-200 pt-8">
                 <h2 className="text-xl font-bold mb-4">Recent Articles</h2>
                 <div className="space-y-3">
-                  {posts.slice(0, 5).map(post => (
-                    <div key={post.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-semibold">{post.title}</p>
-                        <p className="text-sm text-gray-600">{post.author}</p>
+                  {posts.length === 0 ? (
+                    <p className="text-gray-500 text-sm">No published articles yet.</p>
+                  ) : (
+                    posts.slice(0, 5).map(post => (
+                      <div key={post.id} className="flex items-center justify-between p-3 bg-white border border-gray-100 rounded-lg">
+                        <div>
+                          <p className="font-semibold text-sm">{post.title}</p>
+                          <p className="text-xs text-gray-500">{post.author} &middot; {post.categories?.name || 'Uncategorized'}</p>
+                        </div>
+                        <span className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded">Published</span>
                       </div>
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Published</span>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
             </div>
@@ -311,9 +334,9 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     setEditingDraft(null);
                     setShowDraftEditor(true);
                   }}
-                  className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium"
                 >
-                  <Plus size={18} />
+                  <Plus size={16} />
                   New Draft
                 </button>
               </div>
@@ -332,27 +355,26 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
               <div className="space-y-3">
                 {drafts.length === 0 ? (
-                  <div className="text-center py-12 bg-gray-50 rounded-lg">
-                    <FileText size={40} className="mx-auto text-gray-400 mb-2" />
+                  <div className="text-center py-16 bg-white border border-gray-200 rounded-lg">
+                    <FileText size={40} className="mx-auto text-gray-300 mb-3" />
                     <p className="text-gray-500">No drafts yet. Create your first one!</p>
                   </div>
                 ) : (
                   drafts.map(draft => (
-                    <div key={draft.id} className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                      <div className="flex-1">
-                        <h3 className="font-semibold">{draft.title || 'Untitled'}</h3>
-                        <p className="text-sm text-gray-600">{draft.author}</p>
+                    <div key={draft.id} className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-sm truncate">{draft.title || 'Untitled'}</h3>
                         <p className="text-xs text-gray-500 mt-1">
-                          Updated {new Date(draft.updated_at).toLocaleDateString()}
+                          {draft.author} &middot; Updated {new Date(draft.updated_at).toLocaleDateString()}
                         </p>
                       </div>
-                      <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded mr-3">WIP</span>
+                      <span className="text-xs bg-amber-50 text-amber-700 px-2 py-1 rounded mr-4 flex-shrink-0">WIP</span>
                       <button
                         onClick={() => {
                           setEditingDraft(draft);
                           setShowDraftEditor(true);
                         }}
-                        className="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
+                        className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
                       >
                         Edit
                       </button>
@@ -375,15 +397,15 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     resetForm();
                     setShowForm(true);
                   }}
-                  className="flex items-center gap-2 px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+                  className="flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium"
                 >
-                  <Plus size={18} />
+                  <Plus size={16} />
                   New Article
                 </button>
               </div>
 
               {showForm && (
-                <div className="bg-gray-50 border border-gray-300 p-8 rounded-lg mb-8">
+                <div className="bg-white border border-gray-200 p-8 rounded-lg mb-8">
                   <h3 className="text-2xl font-bold mb-8">
                     {editingPost ? 'Edit Article' : 'Create New Article'}
                   </h3>
@@ -397,7 +419,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           value={formData.title}
                           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                           required
-                          className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-black rounded-lg"
+                          className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-black rounded-lg text-sm"
                         />
                       </div>
 
@@ -409,7 +431,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                           placeholder="url-friendly-slug"
                           required
-                          className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-black rounded-lg"
+                          className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-black rounded-lg text-sm"
                         />
                       </div>
                     </div>
@@ -422,7 +444,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           value={formData.author}
                           onChange={(e) => setFormData({ ...formData, author: e.target.value })}
                           required
-                          className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-black rounded-lg"
+                          className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-black rounded-lg text-sm"
                         />
                       </div>
 
@@ -431,7 +453,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         <select
                           value={formData.category_id}
                           onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
-                          className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-black rounded-lg"
+                          className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-black rounded-lg text-sm"
                         >
                           <option value="">Select a category</option>
                           {categories.map(cat => (
@@ -451,7 +473,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
                         placeholder="Short description"
                         required
-                        className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-black rounded-lg"
+                        className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-black rounded-lg text-sm"
                       />
                     </div>
 
@@ -462,7 +484,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                         rows={12}
                         required
-                        className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-black rounded-lg resize-none"
+                        className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-black rounded-lg resize-none text-sm"
                       />
                     </div>
 
@@ -472,24 +494,24 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         id="featured"
                         checked={formData.is_featured}
                         onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
-                        className="w-5 h-5 border border-gray-300 cursor-pointer"
+                        className="w-4 h-4 border border-gray-300 cursor-pointer rounded"
                       />
                       <label htmlFor="featured" className="text-sm font-medium cursor-pointer">
                         Featured Article
                       </label>
                     </div>
 
-                    <div className="flex gap-4">
+                    <div className="flex gap-3">
                       <button
                         type="submit"
-                        className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+                        className="px-6 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium"
                       >
                         {editingPost ? 'Update Article' : 'Publish Article'}
                       </button>
                       <button
                         type="button"
                         onClick={resetForm}
-                        className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                        className="px-6 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm"
                       >
                         Cancel
                       </button>
@@ -500,46 +522,46 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
               <div className="space-y-3">
                 {posts.length === 0 ? (
-                  <div className="text-center py-12 bg-gray-50 rounded-lg">
-                    <Globe size={40} className="mx-auto text-gray-400 mb-2" />
+                  <div className="text-center py-16 bg-white border border-gray-200 rounded-lg">
+                    <Globe size={40} className="mx-auto text-gray-300 mb-3" />
                     <p className="text-gray-500">No published articles yet</p>
                   </div>
                 ) : (
                   posts.map(post => (
-                    <div key={post.id} className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                      <div className="flex-1">
+                    <div key={post.id} className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
+                      <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold">{post.title}</h3>
+                          <h3 className="font-semibold text-sm truncate">{post.title}</h3>
                           {post.is_featured && (
-                            <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">Featured</span>
+                            <span className="text-xs bg-yellow-50 text-yellow-700 px-2 py-0.5 rounded flex-shrink-0">Featured</span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-600">{post.author}</p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Published {new Date(post.published_at).toLocaleDateString()}
+                        <p className="text-xs text-gray-500">
+                          {post.author} &middot; {post.categories?.name || 'Uncategorized'} &middot; {new Date(post.published_at).toLocaleDateString()}
                         </p>
                       </div>
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded mr-3">Published</span>
-                      <button
-                        onClick={() => handleEdit(post)}
-                        className="p-2 hover:bg-gray-200 rounded transition-colors"
-                        title="Edit"
-                      >
-                        <Edit2 size={18} className="text-gray-600" />
-                      </button>
-                      <button
-                        onClick={() => handleUnpublish(post.id)}
-                        className="px-3 py-1 text-sm bg-amber-100 text-amber-600 rounded hover:bg-amber-200 transition-colors"
-                      >
-                        Unpublish
-                      </button>
-                      <button
-                        onClick={() => handleDelete(post.id)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
-                        title="Delete"
-                      >
-                        <Trash2 size={18} />
-                      </button>
+                      <div className="flex items-center gap-2 ml-4 flex-shrink-0">
+                        <button
+                          onClick={() => handleEdit(post)}
+                          className="p-2 hover:bg-gray-100 rounded transition-colors"
+                          title="Edit"
+                        >
+                          <Edit2 size={16} className="text-gray-500" />
+                        </button>
+                        <button
+                          onClick={() => handleUnpublish(post.id)}
+                          className="px-3 py-1.5 text-xs bg-amber-50 text-amber-700 rounded hover:bg-amber-100 transition-colors font-medium"
+                        >
+                          Unpublish
+                        </button>
+                        <button
+                          onClick={() => handleDelete(post.id)}
+                          className="p-2 text-red-500 hover:bg-red-50 rounded transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </div>
                   ))
                 )}

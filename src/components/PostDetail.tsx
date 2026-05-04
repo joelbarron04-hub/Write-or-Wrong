@@ -7,6 +7,10 @@ interface PostDetailProps {
   onBack: () => void;
 }
 
+function isHtmlContent(text: string): boolean {
+  return /<[a-z][\s\S]*>/i.test(text);
+}
+
 export default function PostDetail({ post, onBack }: PostDetailProps) {
   const date = new Date(post.published_at).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -28,7 +32,7 @@ export default function PostDetail({ post, onBack }: PostDetailProps) {
         <header className="mb-12">
           <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-gray-500 mb-6">
             <span>{post.categories?.name || 'Uncategorized'}</span>
-            <span>•</span>
+            <span>&middot;</span>
             <time dateTime={post.published_at}>{date}</time>
           </div>
 
@@ -41,13 +45,20 @@ export default function PostDetail({ post, onBack }: PostDetailProps) {
           </p>
         </header>
 
-        <div className="prose-custom">
-          {post.content.split('\n\n').map((paragraph, index) => (
-            <p key={index} className="text-xl leading-relaxed mb-6 last:mb-0">
-              {paragraph}
-            </p>
-          ))}
-        </div>
+        {isHtmlContent(post.content) ? (
+          <div
+            className="prose-custom"
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
+        ) : (
+          <div className="prose-custom">
+            {post.content.split('\n\n').map((paragraph, index) => (
+              <p key={index} className="text-xl leading-relaxed mb-6 last:mb-0">
+                {paragraph}
+              </p>
+            ))}
+          </div>
+        )}
       </article>
 
       <Comments postId={post.id} />
